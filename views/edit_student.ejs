@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Student</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        form {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            font-weight: bold;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="date"],
+        input[type="file"],
+        button[type="submit"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            box-sizing: border-box;
+        }
+        input[type="file"] {
+            cursor: pointer;
+        }
+        img {
+            margin-top: 10px;
+            display: block;
+            max-width: 100px;
+            height: auto;
+        }
+        button[type="submit"] {
+            background-color: #4d9650;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Edit Student</h1>
+    <form action="/student/edit/<%= student._id %>" method="POST" enctype="multipart/form-data">
+        <div>
+            <label for="studentFirstName">First Name</label>
+            <input type="text" id="studentFirstName" name="studentFirstName" value="<%= student.studentFirstName %>">
+        </div>
+        <div>
+            <label for="studentLastName">Last Name</label>
+            <input type="text" id="studentLastName" name="studentLastName" value="<%= student.studentLastName %>">
+        </div>
+        <div>
+            <label for="dateOfBirth">Date of Birth</label>
+            <input type="date" id="dateOfBirth" name="dateOfBirth" value="<%= student.dateOfBirth.toISOString().split('T')[0] %>">
+        </div>
+        <div>
+            <label for="placeOfBirth">Place of Birth</label>
+            <input type="text" id="placeOfBirth" name="placeOfBirth" value="<%= student.placeOfBirth %>">
+        </div>
+        <div>
+            <label for="studentEmail">Student Email</label>
+            <input type="email" id="studentEmail" name="studentEmail" value="<%= student.studentEmail %>">
+        </div>
+        <div>
+            <label for="studentAddress">Student Address</label>
+            <input type="text" id="studentAddress" name="studentAddress" value="<%= student.studentAddress %>">
+        </div>
+        <div>
+            <label for="studentPhoneNumber">Student Phone Number</label>
+            <input type="text" id="studentPhoneNumber" name="studentPhoneNumber" value="<%= student.studentPhoneNumber %>">
+        </div>
+        <div>
+            <label for="parentName">Parent First Name</label>
+            <input type="text" id="parentName" name="parentName" value="<%= student.parentName %>">
+        </div>
+        <div>
+            <label for="parentLastName">Parent Last Name</label>
+            <input type="text" id="parentLastName" name="parentLastName" value="<%= student.parentLastName %>">
+        </div>
+        <div>
+            <label for="parentEmail">Parent Email</label>
+            <input type="email" id="parentEmail" name="parentEmail" value="<%= student.parentEmail %>">
+        </div>
+        <div>
+            <label for="parentAddress">Parent Address</label>
+            <input type="text" id="parentAddress" name="parentAddress" value="<%= student.parentAddress %>">
+        </div>
+        <div>
+            <label for="parentPhoneNumber">Parent Phone Number</label>
+            <input type="text" id="parentPhoneNumber" name="parentPhoneNumber" value="<%= student.parentPhoneNumber %>">
+        </div>
+        <div>
+            <label for="paymentMethods">Payment Methods</label>
+            <input type="text" id="paymentMethods" name="paymentMethods" value="<%= student.paymentMethods %>">
+        </div>
+        <div>
+            <label for="photo">Photo</label>
+            <input type="file" id="photo" name="photo">
+        </div>
+        <div>
+            <% if (student.photo) { %>
+                <img src="/uploads/<%= student.photo %>" alt="Student Photo" width="50">
+            <% } %>
+        </div>
+        <button type="submit">Update</button>
+    </form>
+</body>
+</html>

@@ -1,0 +1,120 @@
+<!-- cart.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Shopping Cart</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+    
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+        }
+    
+        .cart {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+    
+        .cart-items {
+            list-style-type: none;
+            padding: 0;
+        }
+    
+        .cart-items li {
+            border-bottom: 1px solid #c96363;
+            padding: 10px 0;
+        }
+    
+        .cart-items li:last-child {
+            border-bottom: none;
+        }
+    
+        .cart-items li h3 {
+            margin-bottom: 5px;
+        }
+    
+        .cart-items li p {
+            margin: 5px 0;
+        }
+    
+        .cart-items li p.price {
+            font-weight: bold;
+        }
+    
+        .cart-items li p.total {
+            font-weight: bold;
+            color: rgb(10, 208, 10);
+        }
+    
+        .cart-total {
+            margin-top: 20px;
+            text-align: right;
+            font-size: 18px;
+        }
+    
+        .cart-total p {
+            margin: 5px 0;
+        }
+    
+        .cart-total p.total-price {
+            font-weight: bold;
+        }
+    
+        .proceed-checkout {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .proceed-checkout:hover {
+            background-color: #0056b3;
+        }
+        
+    </style>
+</head>
+
+<body>
+    <h1>Your Shopping Cart</h1>
+    <div class="cart">
+        <% if (cart.length === 0) { %>
+            <p>Your cart is empty.</p>
+        <% } else { %>
+            <ul class="cart-items">
+                <% cart.forEach(item => { %>
+                    <li>
+                        <h3><%= item.productId.name %></h3>
+                        <p><%= item.productId.description %></p>
+                        <p>Price: $<%= item.productId.price %> </p>
+                        <p>Quantity: <%= item.quantity %></p>
+                        <p>Total: <%= (item.productId.price * item.quantity) %></p>
+                    </li>
+                <% }) %>
+            </ul>
+            <p>Total: $<%= cart.reduce((total, item) => total + item.productId.price * item.quantity, 0) %></p>
+            <% let publisherKey = "pk_test_51P93F1SEesVIE0tAeDjDTitLvAzRdEYq9zfJ6SKVXbIo8wIL0PzCTKZJvQfhl6v4TenMv1GtXPhFe3yP0Czv88Eq00blyDzDiL" %>
+            <% let Total = cart.reduce((total, item) => total + item.productId.price * item.quantity, 0) %>
+            <% let email = req.user.email %>
+
+            <form action="/payment" method="post">
+                <input type="submit" value="Proceed to Checkout">
+                <input type="hidden" name = "price"value="<%= Total %>">
+                <input type="hidden" name = "email" value="<%= email %>">
+                <input type="hidden" name = "publisherKey" value="<%= publisherKey %>">
+            </form>
+        <% } %>
+    </div>
+</body>
+</html>
