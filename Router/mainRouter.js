@@ -29,7 +29,7 @@ router.get('/ecom_invoice',authMiddleware, mainController.ecom_invoice);
 // router.get('/ecom_product_details',authMiddleware, mainController.ecom_product_details);
 // router.get('/ecom_product_grid',authMiddleware, mainController.ecom_product_grid);
 router.get('/ecom_product_list',authMiddleware, mainController.ecom_product_list);
-router.get('/ecom_product_order',authMiddleware, mainController.ecom_product_order);
+// router.get('/ecom_product_order',authMiddleware, mainController.ecom_product_order);
 // router.get('/edit_profile',authMiddleware, mainController.edit_profile);
 router.get('/email_compose',authMiddleware, mainController.email_compose);
 router.get('/email_inbox',authMiddleware, mainController.email_inbox);

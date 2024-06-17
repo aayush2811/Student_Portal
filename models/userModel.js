@@ -47,6 +47,11 @@ var userSchema = new mongoose.Schema({
     city: {
         type: String,
     },
+    role: {
+        type: String,
+        enum: ['Student', 'Teacher', 'Admin'],
+        required: true,
+    },
     cart: [{
         productId: {
             type: mongoose.Schema.Types.ObjectId,

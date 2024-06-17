@@ -31,6 +31,10 @@ const orderSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    paymentStatus: {
+        type: Boolean,
+        default: false
+    },
 });
 
 module.exports = mongoose.model('Order', orderSchema)

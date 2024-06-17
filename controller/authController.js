@@ -1,27 +1,31 @@
 const UserModel = require('../models/userModel');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
+require('dotenv').config();
 let otpStore = {};
 
-const transporter = nodemailer.createTransport({
-	service: 'Gmail',
-	auth: {
-        user: 'abhatt2811@gmail.com',
-        pass: "pmww avia fqwd ritt", // Your email password or app password
+const adminCredentials = {
+    email: 'admin@gmail.com',
+    password: 'admin@123',
+    role: 'Admin'
+};
 
-	}
+const transporter = nodemailer.createTransport({
+    service: process.env.EMAIL_SERVICE,
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+    }
 });
 
 exports.forgotPassword = async (req, res) => {
     try {
         const { email } = req.body;
         
-        // Check if email exists in the database
         const user = await UserModel.findOne({ email });
         if (!user) {
-            // If user does not exist, send back to login page with error message
             return res.render('page_login', { error: 'Invalid email address' });
         }
 
@@ -29,7 +33,7 @@ exports.forgotPassword = async (req, res) => {
         otpStore[email] = otp;
 
         const mailOptions = {
-            from: 'abhatt2811@gmail.com',
+            from: process.env.EMAIL_USER,
             to: email,
             subject: 'Password Reset OTP',
             text: `Your OTP for password reset is ${otp}`
@@ -48,39 +52,40 @@ exports.forgotPassword = async (req, res) => {
 };
 
 exports.verifyOTP = async (req, res) => {
-	const { email, otp, newPassword, confirmPassword } = req.body;
-	if (otpStore[email] === otp) {
-		if (newPassword !== confirmPassword) {
-			return res.status(400).send('Passwords do not match');
-		}
+    const { email, otp, newPassword, confirmPassword } = req.body;
+    if (otpStore[email] === otp) {
+        if (newPassword !== confirmPassword) {
+            return res.status(400).send('Passwords do not match');
+        }
 
-		const hashedPassword = await bcrypt.hash(newPassword, 10);
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-		const user = await UserModel.findOne({ email });
-		if (user) {
-			user.password = hashedPassword;
-			await user.save();
-			delete otpStore[email];
-			return res.redirect('/page_login');
-		}
-		return res.status(400).send('User not found');
-	}
-	res.status(400).send('Invalid OTP');
+        const user = await UserModel.findOne({ email });
+        if (user) {
+            user.password = hashedPassword;
+            await user.save();
+            delete otpStore[email];
+            return res.redirect('/page_login');
+        }
+        return res.status(400).send('User not found');
+    }
+    res.status(400).send('Invalid OTP');
 };
 
 exports.register = async (req, res) => {
     try {
-        const { username, email, password } = req.body;
+        const { username, email, password, role } = req.body;
         let user = await UserModel.findOne({ email });
         if (user) {
             return res.status(400).json({ msg: 'User already exists' });
         }
-        const token = jwt.sign({ email }, "vjdnsvks", { expiresIn: "1h" });
+        const token = jwt.sign({ email, role }, "vjdnsvks", { expiresIn: "1h" });
 
-       const data = await new UserModel({
+        const data = await new UserModel({
             username,
             email,
             password,
+            role,
             token
         });
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -96,8 +101,17 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
     try {
-        const { email, password } = req.body;
-        let user = await UserModel.findOne({ email });
+        const { email, password, role } = req.body;
+
+        if (email === adminCredentials.email && password === adminCredentials.password && role === adminCredentials.role) {
+            req.session.userId = 'admin-static-id';
+            req.session.role = 'Admin';
+            const redirectTo = req.session.redirectTo || '/index';
+            delete req.session.redirectTo;
+            return res.redirect(redirectTo);
+        }
+
+        let user = await UserModel.findOne({ email, role });
 
         if (!user) {
             return res.status(400).json({ msg: 'User does not exist' });
@@ -108,11 +122,11 @@ exports.login = async (req, res) => {
             return res.status(400).json({ msg: 'Invalid credentials' });
         }
 
-        // Store user ID in session
         req.session.userId = user._id;
+        req.session.role = user.role;
         const redirectTo = req.session.redirectTo || '/index';
-        delete req.session.redirectTo; 
-        res.redirect(redirectTo); 
+        delete req.session.redirectTo;
+        res.redirect(redirectTo);
 
     } catch (error) {
         console.error(error.message);
@@ -120,19 +134,19 @@ exports.login = async (req, res) => {
     }
 };
 
-
 exports.getEditProfile = async (req, res) => {
     try {
-        const userId = req.session.userId; 
+        const userId = req.session.userId;
         const user = await UserModel.findById(userId);
         if (!user) {
             return res.status(404).send('User not found');
         }
-        res.render('edit_profile', { user }); 
+        res.render('edit_profile', { user });
     } catch (error) {
         res.status(500).send('Server error');
     }
 };
+
 exports.updateProfile = async (req, res) => {
     try {
         const userId = req.session.userId;
@@ -142,7 +156,6 @@ exports.updateProfile = async (req, res) => {
 
         const { name, surname, specialty, skills, gender, birth, phone, email, country, city } = req.body;
         
-        // Update the user's profile data
         const updatedUser = await UserModel.findByIdAndUpdate(userId, {
             name,
             surname,
@@ -160,11 +173,9 @@ exports.updateProfile = async (req, res) => {
             return res.status(404).send('User not found');
         }
 
-        res.redirect('/edit_profile'); // Redirect to the profile page or any other appropriate page
+        res.redirect('/edit_profile');
     } catch (error) {
         console.error("Error updating profile:", error);
         res.status(500).send('Server error');
     }
 };
-
-

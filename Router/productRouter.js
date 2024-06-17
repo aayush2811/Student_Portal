@@ -32,5 +32,11 @@ router.post('/add-to-cart', middleware, productController.addToCart);
 
 // Payment
 router.post('/payment', middleware, productController.payment);
+router.get('/ecom_product_order/success', middleware, productController.successPayment);
+
+// Order
+router.post('/ecom_product_order', middleware, productController.createOrder);
+router.get('/ecom_product_order', middleware, productController.getOrders);
+
 
 module.exports = router;
