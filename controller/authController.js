@@ -1,9 +1,8 @@
 const UserModel = require('../models/userModel');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
-require('dotenv').config();
 let otpStore = {};
 
 const adminCredentials = {
@@ -12,8 +11,9 @@ const adminCredentials = {
     role: 'Admin'
 };
 
+
 const transporter = nodemailer.createTransport({
-    service: process.env.EMAIL_SERVICE,
+    service: 'Gmail',
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
@@ -24,8 +24,10 @@ exports.forgotPassword = async (req, res) => {
     try {
         const { email } = req.body;
         
+        // Check if email exists in the database
         const user = await UserModel.findOne({ email });
         if (!user) {
+            // If user does not exist, send back to login page with error message
             return res.render('page_login', { error: 'Invalid email address' });
         }
 

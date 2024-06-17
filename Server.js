@@ -1,7 +1,9 @@
+require('dotenv').config();
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 require('./database/connection');
+const port = 3000;
 const path = require('path');
 const mainRouter = require('./Router/mainRouter');
 const authRouter = require('./Router/authRouter');
@@ -12,15 +14,12 @@ const productRouter = require('./Router/productRouter');
 const emailRouter = require('./Router/emailRouter');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
-require('dotenv').config();
-
-const port = process.env.PORT || 3000;
 
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
-    store: MongoStore.create({ mongoUrl: process.env.DB_CONNECTION_STRING }),
+    store: MongoStore.create({ mongoUrl: process.env.DATABASE_URL }),
     cookie: { secure: false }
 }));
 
